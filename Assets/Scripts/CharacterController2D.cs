@@ -145,7 +145,7 @@ public class CharacterController2D : MonoBehaviour
                 // Disable one of the colliders when crouching
                 if (m_CrouchDisableCollider != null)
                 {
-                    m_CrouchDisableCollider.enabled = false;
+                //    m_CrouchDisableCollider.enabled = false;
                  //   animator.SetTrigger("2To4");
                  //   animator.ResetTrigger("4To2");
 
@@ -159,7 +159,7 @@ public class CharacterController2D : MonoBehaviour
                 {
                   //  m_CrouchDisableCollider.enabled = true;
                   //  animator.SetTrigger("4To2");
-                  //  animator.ResetTrigger("2To4");
+                   // animator.ResetTrigger("2To4");
                 }
 
 

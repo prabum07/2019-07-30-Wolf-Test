@@ -65,7 +65,7 @@ public class WallSlide : MonoBehaviour
             }
             else if(col.Length!=0)
             {
-               if( col[0].GetComponent<WallDirectionCheck>().Front)
+               if( true)
                 {
                     rb.AddForce(new Vector2(-20, 30), ForceMode.Impulse);
                     this.transform.eulerAngles = new Vector3(0, 0, 0);

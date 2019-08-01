@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     {
         FrontCheckOffset = this.transform.position - frontCheck.transform.position;
         BackCheckOffset = this.transform.position - BackCheck.transform.position;
-    // PlayerPrefs.DeleteAll();
+   // PlayerPrefs.DeleteAll();
         if(PlayerPrefs.GetFloat("BaseSpeed")==0.0f)
         {
             PlayerPrefs.SetFloat("BaseSpeed",50f);
@@ -323,12 +323,19 @@ public class PlayerMovement : MonoBehaviour
         if (Input.touchCount > 1 || Input.GetKey(KeyCode.DownArrow))
         {
             crouch = true;
-            //animator.SetTrigger("2To4");
-        } 
+            animator.SetTrigger("2To4");
+
+        }
         else
         {
+            
+        }
+        if(Input.touchCount < 2 || Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            animator.ResetTrigger("2To4");
+            animator.SetTrigger("4To2");
             crouch = false;
-            //animator.SetTrigger("4To2");
+
         }
 
         if (Input.GetMouseButton(0) )
@@ -431,7 +438,19 @@ public class PlayerMovement : MonoBehaviour
       
             res = Physics2D.OverlapCircleAll(wallCheckPoint.transform.position, 0.15f, WallLayer);
 
-       
+        if (GetComponent<CharacterController2D>().m_Grounded == false && res.Length == 0)
+        {
+              if(NormalMove==false)
+            {
+                    controller.Move(horizontalMove * Time.deltaTime, crouch, false);
+
+            }
+
+        }else
+        {
+            controller.Move(horizontalMove * Time.deltaTime, crouch, false);
+
+        }
 
         if (!GetComponent<CharacterController2D>().m_Grounded && res.Length != 0)
         {
@@ -443,7 +462,6 @@ public class PlayerMovement : MonoBehaviour
                 straigtJump = false;
             }
         }
-
         if (GetComponent<CharacterController2D>().m_Grounded )
         {
             if(straigtJump==false)
@@ -461,7 +479,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (DOTouchCount)
                     {
-                            controller.Move(horizontalMove * Time.deltaTime, crouch, true);
+                            controller.Move(0 * Time.deltaTime, crouch, true);
                         DOTouchCount = false;
                     }
                    // controller.Move(horizontalMove * Time.deltaTime, crouch, true);
@@ -472,14 +490,14 @@ public class PlayerMovement : MonoBehaviour
                     {
                         wallCheckPoint = frontCheck.transform;
                     }
-                    controller.Move(horizontalMove * Time.deltaTime, crouch, false);
+               //     controller.Move(horizontalMove * Time.deltaTime, crouch, false);
                     if (NormalMove == true)
                     {
                         NormalMove = false;
                     }
                 }
 
-                print("run");
+
               }else
             {
                 
@@ -487,8 +505,15 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (DOTouchCount)
                     {
-                                   NormalMove = true;
-                                    controller.Move(horizontalMove * Time.deltaTime, crouch, true);
+                            if(NormalMove==false)
+                             {
+                            print("as");
+
+                            runSpeed = BaseSpeed-1;
+                            NormalMove = true;
+
+                             }
+                        controller.Move(0 * Time.deltaTime, crouch, true);
                                  //  StartCoroutine(WallJumpRoutine());
                                     print("jump");
                                    DOTouchCount = false;
@@ -500,23 +525,31 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (GetComponent<CharacterController2D>().m_Grounded == false && res.Length != 0)
         {
+            if (NormalMove == false)
+            {
+                print("as");
+                runSpeed = BaseSpeed-1;
+                NormalMove = true;
+
+            }
+
             if (Input.touchCount == 1 || Input.GetKeyDown(KeyCode.UpArrow))
             {
                 if (DOTouchCount)
                 {
                     if (WallJumpActive == false)
                 {
-                    if (res[0].GetComponent<WallDirectionCheck>().Front)
+                    if (wallCheckPoint.gameObject==BackCheck)
                     {
 
                         if (WallJumpActiveBool == false)
                         {
-                            if (res[0].GetComponent<WallDirectionCheck>().Flip == false)
+                           // if (res[0].GetComponent<WallDirectionCheck>().Flip == false)
                                 this.GetComponent<SpriteRenderer>().flipX = false;
                             print("walljump1" + res[0]);
                             BoxCollider2D temp = res[0].GetComponent<BoxCollider2D>();
 
-                            StartCoroutine(WallJumpRoutine());
+                                StartCoroutine(WallJumpRoutine());
 
                             StartCoroutine(Walljumpactivate(true, temp));
                             WallJumpActiveBool = true;
@@ -524,16 +557,17 @@ public class PlayerMovement : MonoBehaviour
                         }
 
                     }
-                    else
+                    else if(wallCheckPoint.gameObject == frontCheck)
                     {
                         if (WallJumpActiveBool == false)
                         {
-                            if (res[0].GetComponent<WallDirectionCheck>().Flip == false)
+                         //   if (res[0].GetComponent<WallDirectionCheck>().Flip == false)
                                 this.GetComponent<SpriteRenderer>().flipX = true;
 
                             BoxCollider2D temp = res[0].GetComponent<BoxCollider2D>();
 
-                            StartCoroutine(Walljumpactivate(false, temp));
+
+                                StartCoroutine(Walljumpactivate(false, temp));
                             StartCoroutine(WallJumpRoutine());
 
                             print("walljump2" + res[0]);
@@ -553,9 +587,13 @@ public class PlayerMovement : MonoBehaviour
             if (rb2d.velocity.y < 0)
             {
                 //  print(GetComponent<CharacterController2D>().m_Grounded);
-
+             //   animator.SetBool("wallslide",true);
                 rb2d.velocity = new Vector2(rb2d.velocity.x, -WallSlideGravity);
                 //  rb2d.velocity = new Vector2(rb2d.velocity.x, GetComponent<CharacterController2D>().terminalVelocity);
+            }else
+            {
+                //animator.SetBool("wallslide", false);
+
             }
 
         }
@@ -604,7 +642,6 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             transform.position = new Vector2(transform.position.x - 0.5f, transform.position.y);
-            Debug.LogError("i");
             rb2d.velocity = new Vector2(0, 0);
             rb2d.angularVelocity = 0f;
             rb2d.AddForce(new Vector2((-walljumpForceLeft * 1000f * 2.5f * Time.deltaTime), (GetComponent<CharacterController2D>().m_JumpForce * walljumpAmplitudeLeft * 1000f * Time.deltaTime)));
