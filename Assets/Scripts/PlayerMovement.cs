@@ -52,11 +52,11 @@ public class PlayerMovement : MonoBehaviour
     {
         FrontCheckOffset = this.transform.position - frontCheck.transform.position;
         BackCheckOffset = this.transform.position - BackCheck.transform.position;
-   // PlayerPrefs.DeleteAll();
+        //  PlayerPrefs.DeleteAll();
         if(PlayerPrefs.GetFloat("BaseSpeed")==0.0f)
         {
-            PlayerPrefs.SetFloat("BaseSpeed",50f);
-            BaseSpeedtxt.text = "50";
+            PlayerPrefs.SetFloat("BaseSpeed",25f);
+            BaseSpeedtxt.text = "25";
         }
         else
         {
@@ -67,8 +67,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("TargetSpeed") == 0.0f)
         {
-            PlayerPrefs.SetFloat("TargetSpeed", 100);
-            TargetSpeedTxt.text = "100";
+            PlayerPrefs.SetFloat("TargetSpeed", 50f);
+            TargetSpeedTxt.text = "50";
         }
         else
         {
@@ -78,8 +78,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("MaxRunForce") == 0.0f)
         {
-            PlayerPrefs.SetFloat("MaxRunForce", 50f);
-            MaxRunForceTxt.text = "50";
+            PlayerPrefs.SetFloat("MaxRunForce", 100f);
+            MaxRunForceTxt.text = "100";
         }
         else
         {
@@ -90,9 +90,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("m_JumpForce") == 0.0f)
         {
-            PlayerPrefs.SetFloat("m_JumpForce", 12f);
-            GetComponent<CharacterController2D>().m_JumpForce = 12f;
-            GetComponent<CharacterController2D>().m_JumpForceTxt.text = "12";
+            PlayerPrefs.SetFloat("m_JumpForce", 25f);
+            GetComponent<CharacterController2D>().m_JumpForce = 25f;
+            GetComponent<CharacterController2D>().m_JumpForceTxt.text = "25";
         }
         else
         {
@@ -103,9 +103,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("playerGravityScale") == 0.0f)
         {
-            PlayerPrefs.SetFloat("playerGravityScale", 2f);
-            GetComponent<CharacterController2D>().playerGravityScaleTxt.text = "2";
-            GetComponent<Rigidbody2D>().gravityScale = 2f;
+            PlayerPrefs.SetFloat("playerGravityScale", 5f);
+            GetComponent<CharacterController2D>().playerGravityScaleTxt.text = "5";
+            GetComponent<Rigidbody2D>().gravityScale = 5f;
 
         }
         else
@@ -118,8 +118,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("terminalVelocity") == 0.0f)
         {
-            PlayerPrefs.SetFloat("terminalVelocity", -80f);
-            GetComponent<CharacterController2D>().terminalVelocityTxt.text = "-80";
+            PlayerPrefs.SetFloat("terminalVelocity", -100f);
+            GetComponent<CharacterController2D>().terminalVelocityTxt.text = "-100";
          
 
         }
@@ -143,9 +143,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("walljumpAmplitudeLeft") == 0.0f)
         {
-            PlayerPrefs.SetFloat("walljumpAmplitudeLeft", 4);
-           walljumpAmplitudeLeftTxt.text = "4";
-            walljumpAmplitudeLeft = 4;
+            PlayerPrefs.SetFloat("walljumpAmplitudeLeft", 3);
+           walljumpAmplitudeLeftTxt.text = "3";
+            walljumpAmplitudeLeft = 3;
         }
         else
         {
@@ -168,9 +168,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("walljumpForceLeft") == 0.0f)
         {
-            PlayerPrefs.SetFloat("walljumpForceLeft", 10);
-            walljumpForceLeftTxt.text = "10";
-            walljumpForceLeft = 10;
+            PlayerPrefs.SetFloat("walljumpForceLeft", 12.5f);
+            walljumpForceLeftTxt.text = "12.5";
+            walljumpForceLeft = 12.5f;
 
         }
         else
@@ -193,9 +193,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (PlayerPrefs.GetFloat("WallSlideGravity") == 0.0f)
         {
-            PlayerPrefs.SetFloat("WallSlideGravity", 0.7f);
+            PlayerPrefs.SetFloat("WallSlideGravity", 10f);
 
-            WallSlideGravityTxt.text = "0.7f";
+            WallSlideGravityTxt.text = "10f";
           //  UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
         else
@@ -322,6 +322,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.touchCount > 1 || Input.GetKey(KeyCode.DownArrow))
         {
+            print("down");
             crouch = true;
             animator.SetTrigger("2To4");
 
@@ -330,8 +331,10 @@ public class PlayerMovement : MonoBehaviour
         {
             
         }
-        if(Input.touchCount < 2 || Input.GetKeyUp(KeyCode.DownArrow))
+        if((Input.touchCount > 0 &&  Input.touchCount < 2) || Input.GetKeyUp(KeyCode.DownArrow))
         {
+            print("down");
+
             animator.ResetTrigger("2To4");
             animator.SetTrigger("4To2");
             crouch = false;
@@ -475,7 +478,9 @@ public class PlayerMovement : MonoBehaviour
             }
             if (res.Length==0)
             {
-                if(Input.touchCount==1 && !MainPanel.activeInHierarchy && !btn.activeInHierarchy || Input.GetKeyDown(KeyCode.UpArrow))
+                animator.SetBool("wallslide", false);
+
+                if (Input.touchCount==1 && !MainPanel.activeInHierarchy && !btn.activeInHierarchy || Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     if (DOTouchCount)
                     {
@@ -587,14 +592,23 @@ public class PlayerMovement : MonoBehaviour
             if (rb2d.velocity.y < 0)
             {
                 //  print(GetComponent<CharacterController2D>().m_Grounded);
-             //   animator.SetBool("wallslide",true);
+                animator.SetBool("wallslide",true);
                 rb2d.velocity = new Vector2(rb2d.velocity.x, -WallSlideGravity);
                 //  rb2d.velocity = new Vector2(rb2d.velocity.x, GetComponent<CharacterController2D>().terminalVelocity);
             }else
             {
-                //animator.SetBool("wallslide", false);
+                animator.SetBool("wallslide", false);
 
             }
+
+        }else if(GetComponent<CharacterController2D>().m_Grounded == false && res.Length == 0)
+        {
+            animator.SetBool("wallslide", false);
+
+        }
+        else if (GetComponent<CharacterController2D>().m_Grounded == true && res.Length != 0)
+        {
+            animator.SetBool("wallslide", false);
 
         }
 
@@ -607,7 +621,10 @@ public class PlayerMovement : MonoBehaviour
         
       //  Debug.LogError(temp.enabled);
         yield return new WaitForSeconds(0.2f);
-        temp.enabled = true;
+        if (temp.GetComponent<BoxCollider2D>())
+        {
+            temp.enabled = true;
+        }
         WallJumpActiveBool = false;
 
 
@@ -626,7 +643,11 @@ public class PlayerMovement : MonoBehaviour
     public bool WallJumpActiveBool;
     IEnumerator Walljumpactivate(bool front, BoxCollider2D temp)
     {
-        temp.enabled = false;
+        if(temp.GetComponent<BoxCollider2D>())
+        {
+            temp.enabled = false;
+
+        }
         yield return null;
         if (front)
         {
